@@ -57,10 +57,10 @@ def GetRectEdges(img):
     bottomright_y = y4
     return topleft_x, topleft_y, bottomright_x, bottomright_y
 
-def GetRectSection(img,(x1,y1),(x2,y2)):
+def GetRectSection(img,tl,br):
     #rectangle(img, (x1,y1), (x2,y2), 128, 1)
     clone = img.copy()
-    roi = clone[y1:y2,x1:x2]
-    imshow("XDDD", roi)
+    roi = clone[tl[1]:br[1],tl[0]:br[0]]
+    imshow("cropped rectangle", roi)
 
 
