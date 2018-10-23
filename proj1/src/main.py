@@ -5,7 +5,7 @@ from cv2 import *
 
 #img = camera.CaptureCameraImage()
 
-img = imread('../imgs/two.png')
+img = imread('../imgs/allright.png')
 img = algorithm.SmoothImage(img)
 img = algorithm.ConvertToYCbCr(img)
 img = algorithm.ConvertToBinary(img)
