@@ -5,8 +5,7 @@ from cv2 import *
 
 #img = camera.CaptureCameraImage()
 
-img = imread('../imgs/one.jpg')
-img = algorithm.Gaussian(img)
+img = imread('../imgs/two.png')
 img = algorithm.SmoothImage(img)
 img = algorithm.ConvertToYCbCr(img)
 img = algorithm.ConvertToBinary(img)
