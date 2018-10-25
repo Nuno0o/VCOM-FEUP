@@ -9,19 +9,16 @@ def ConvertToYCbCr(img):
     ycbcr = cvtColor(img, COLOR_BGR2YCR_CB)
     return ycbcr
 
+def ConvertToHSV(img):
+    hsv = cvtColor(img, COLOR_BGR2HSV)
+    return hsv
+
 def DetectSkin(img):
-    cr_min = 133
-    cr_max = 173
-    cb_min = 77
-    cb_max = 127
-    averageLuminance = 0
-    #Get average luminance of image to influence the minimum luminance to detect skin
-    for y in range(0, img.shape[0]):
-        for x in range(0, img.shape[1]):
-            averageLuminance += img[y][x][0]
-    averageLuminance /= img.shape[0] * img.shape[1]
-    l_min = int(round(averageLuminance * 0.4))
-    ranges = inRange(img, np.array([l_min, cr_min, cb_min]), np.array([255, cr_max, cb_max]))
+    h_min = 0
+    h_max = 50
+    s_min = int(round(0.23 * 255))
+    s_max = int(round(0.68 * 255))
+    ranges = inRange(img, np.array([h_min, s_min, 0]), np.array([h_max, s_max, 255]))
     return ranges
 
 def ErodeImg(img):

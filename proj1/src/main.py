@@ -5,7 +5,7 @@ from cv2 import *
 
 img = gui.Menu()
 img = algorithm.SmoothImage(img)
-img = algorithm.ConvertToYCbCr(img)
+img = algorithm.ConvertToHSV(img)
 #img = algorithm.ConvertToBinary(img)
 img = algorithm.DetectSkin(img)
 
