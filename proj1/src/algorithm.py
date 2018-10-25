@@ -1,5 +1,5 @@
 from cv2 import *
-import numpy
+import numpy as np
 
 def SmoothImage(img):
     blur = bilateralFilter(img,5,75,75)
@@ -8,6 +8,34 @@ def SmoothImage(img):
 def ConvertToYCbCr(img):
     ycbcr = cvtColor(img, COLOR_BGR2YCR_CB)
     return ycbcr
+
+def DetectSkin(img):
+    cr_min = 133
+    cr_max = 173
+    cb_min = 77
+    cb_max = 127
+    averageLuminance = 0
+    #Get average luminance of image to influence the minimum luminance to detect skin
+    for y in range(0, img.shape[0]):
+        for x in range(0, img.shape[1]):
+            averageLuminance += img[y][x][0]
+    averageLuminance /= img.shape[0] * img.shape[1]
+    l_min = int(round(averageLuminance * 0.4))
+    ranges = inRange(img, np.array([l_min, cr_min, cb_min]), np.array([255, cr_max, cb_max]))
+    return ranges
+
+def ErodeImg(img):
+    kernel1Size_x = int(round(img.shape[0]/140))
+    kernel1Size_y = int(round(img.shape[1]/140))
+    kernel2Size_x = int(round(img.shape[0]/110))
+    kernel2Size_y = int(round(img.shape[1]/110))
+    kernel = np.ones((kernel1Size_x,kernel1Size_y),np.uint8)
+    kernel2 = np.ones((kernel2Size_x,kernel2Size_y),np.uint8)
+    erosion = erode(img, kernel, iterations=8)
+    erosion = dilate(erosion,kernel2, iterations=3)
+    erosion = dilate(erosion,kernel, iterations=4)
+
+    return erosion
 
 def ConvertToBinary(img):
     y,cb,cr = split(img)
