@@ -1,36 +1,66 @@
 from cv2 import *
 import numpy as np
 
+np.set_printoptions(threshold=np.nan)
+
 def SmoothImage(img):
-    blur = bilateralFilter(img,5,75,75)
+    blur = GaussianBlur(img,(5,5),0)
     return blur
 
-def ConvertToYCbCr(img):
-    ycbcr = cvtColor(img, COLOR_BGR2YCR_CB)
-    return ycbcr
+def ResizeImage(img):
+    img2 = resize(img, (400,400))
+    return img2
+
+def ConvertToYCrCb(img):
+    ycrcb = cvtColor(img, COLOR_BGR2YCR_CB)
+    return ycrcb
 
 def ConvertToHSV(img):
     hsv = cvtColor(img, COLOR_BGR2HSV)
     return hsv
 
-def DetectSkin(img):
-    h_min = 0
-    h_max = 50
-    s_min = int(round(0.23 * 255))
-    s_max = int(round(0.68 * 255))
-    ranges = inRange(img, np.array([h_min, s_min, 0]), np.array([h_max, s_max, 255]))
+def DetectHands(img):
+    x_min = 0
+    x_max = 50
+    y_min = 40
+    y_max = 180
+    z_min = 70
+    z_max = 255
+    ranges = inRange(img, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
+    #apply median blur to remove small components
+    #ranges = medianBlur(ranges, ksize=9)
+    #find all your connected components (white blobs in your image)
+    '''nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(ranges, connectivity=8)
+    print(stats)
+    #connectedComponentswithStats yields every seperated component with information on each of them, such as size
+    #the following part is just taking out the background which is also considered a component, but most of the time we don't want that.
+    sizes = stats[1:, -1]; 
+    nb_components = nb_components - 1
+    stats2 = stats[1:]
+    print(stats2)
+
+    # minimum size of particles we want to keep (number of pixels)
+    #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
+    min_size = 150  
+
+    #your answer image
+    img2 = np.zeros((output.shape))
+    #for every component in the image, you keep it only if it's above min_size
+    for i in range(0, nb_components):
+        if sizes[i] >= min_size:
+            img2[output == i + 1] = 255
+    '''
     return ranges
 
 def ErodeImg(img):
-    kernel1Size_x = int(round(img.shape[0]/140))
-    kernel1Size_y = int(round(img.shape[1]/140))
-    kernel2Size_x = int(round(img.shape[0]/110))
-    kernel2Size_y = int(round(img.shape[1]/110))
+    kernel1Size_x = 2
+    kernel1Size_y = 2
+    kernel2Size_x = 3
+    kernel2Size_y = 3
     kernel = np.ones((kernel1Size_x,kernel1Size_y),np.uint8)
     kernel2 = np.ones((kernel2Size_x,kernel2Size_y),np.uint8)
-    erosion = erode(img, kernel, iterations=8)
-    erosion = dilate(erosion,kernel2, iterations=3)
-    erosion = dilate(erosion,kernel, iterations=4)
+    #erosion = erode(img, kernel, iterations=3)
+    #erosion = dilate(erosion,kernel2, iterations=4)
 
     return erosion
 
