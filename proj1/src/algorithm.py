@@ -1,5 +1,6 @@
 from cv2 import *
 import numpy as np
+from matplotlib import pyplot as plt
 
 np.set_printoptions(threshold=np.nan)
 
@@ -24,7 +25,7 @@ def DetectHands(img):
     x_max = 50
     y_min = 40
     y_max = 180
-    z_min = 70
+    z_min = 50
     z_max = 255
     ranges = inRange(img, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
     #apply median blur to remove small components
@@ -63,7 +64,22 @@ def DetectGestures(img):
         color = (255,0,0)
         drawContours(drawing,contours,i,color_contours,1,8,hierarchy)
         drawContours(drawing,hull,i,color,1,8)
+    centroids = GetCentroid(hull)
+    for i in range(len(centroids)):
+        color_centroids = (0,0,255)
+        drawing[centroids[i][1]][centroids[i][0]] = color_centroids
     return drawing
+
+def GetCentroid(hull):
+    centroids = []
+    for h in hull:
+        x = []
+        y = []
+        for point in h:
+            x.append(point[0][0])
+            y.append(point[0][1])
+        centroids.append((int(round(np.mean(x))), int(round(np.mean(y)))))
+    return centroids
 
 def ErodeImg(img):
     kernel1Size_x = 2
