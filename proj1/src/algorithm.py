@@ -52,6 +52,19 @@ def DetectHands(img):
     '''
     return ranges
 
+def DetectGestures(img):
+    _, contours, hierarchy = findContours(img, RETR_TREE, CHAIN_APPROX_SIMPLE)
+    hull = []
+    for i in range(len(contours)):
+        hull.append(convexHull(contours[i],False))
+    drawing = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
+    for i in range(len(contours)):
+        color_contours = (0,255,0)
+        color = (255,0,0)
+        drawContours(drawing,contours,i,color_contours,1,8,hierarchy)
+        drawContours(drawing,hull,i,color,1,8)
+    return drawing
+
 def ErodeImg(img):
     kernel1Size_x = 2
     kernel1Size_y = 2
