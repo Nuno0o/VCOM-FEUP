@@ -57,7 +57,7 @@ def DetectGestures(img):
     _, contours, hierarchy = findContours(img, RETR_TREE, CHAIN_APPROX_SIMPLE)
     hull = []
 
-    color_centroids = (0,0,255)    
+    color_centroids = (255,255,255)    
     color_contours = (0,255,0)
     color = (255,0,0)
 
@@ -66,7 +66,16 @@ def DetectGestures(img):
     drawing = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
 
     biggest_centroid, bc_index = GetBiggestCentroid(hull)
+
+    # Draw Centroid
     drawing[biggest_centroid[1]][biggest_centroid[0]] = color_centroids
+    # To see it slightly better, draw pixels around it in same color
+    drawing[biggest_centroid[1] + 1][biggest_centroid[0]] = color_centroids
+    drawing[biggest_centroid[1] - 1][biggest_centroid[0]] = color_centroids
+    drawing[biggest_centroid[1] + 1][biggest_centroid[0] + 1] = color_centroids
+    drawing[biggest_centroid[1] + 1][biggest_centroid[0] - 1] = color_centroids
+    drawing[biggest_centroid[1] - 1][biggest_centroid[0] + 1] = color_centroids
+    drawing[biggest_centroid[1] - 1][biggest_centroid[0] - 1] = color_centroids
 
     drawContours(drawing,contours,bc_index,color_contours,1,8,hierarchy)
     drawContours(drawing,hull,bc_index,color,1,8)
@@ -105,6 +114,10 @@ def GetBiggestCentroid(hull):
             biggest_centroid = [x_centroid, y_centroid]
             max_i = i
     return biggest_centroid, max_i
+
+# Calculate and Display disposition of the vertexes in a histogram
+#def CalcDispVertexHist(centroid, vertexes):
+    
 
 def ErodeImg(img):
     kernel1Size_x = 2
