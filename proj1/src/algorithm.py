@@ -56,17 +56,21 @@ def DetectHands(img):
 def DetectGestures(img):
     _, contours, hierarchy = findContours(img, RETR_TREE, CHAIN_APPROX_SIMPLE)
     hull = []
+
+    color_centroids = (0,0,255)    
+    color_contours = (0,255,0)
+    color = (255,0,0)
+
     for i in range(len(contours)):
         hull.append(convexHull(contours[i],False))
     drawing = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
-    for i in range(len(contours)):
-        color_contours = (0,255,0)
-        color = (255,0,0)
-        drawContours(drawing,contours,i,color_contours,1,8,hierarchy)
-        drawContours(drawing,hull,i,color,1,8)
-    biggest_centroid = GetBiggestCentroid(hull)
-    color_centroids = (0,0,255)
+
+    biggest_centroid, bc_index = GetBiggestCentroid(hull)
     drawing[biggest_centroid[1]][biggest_centroid[0]] = color_centroids
+
+    drawContours(drawing,contours,bc_index,color_contours,1,8,hierarchy)
+    drawContours(drawing,hull,bc_index,color,1,8)
+
     return drawing
 
 def GetCentroid(hull):
@@ -86,6 +90,7 @@ def GetBiggestCentroid(hull):
     centroids = GetCentroid(hull)
     max_avg = 0
     biggest_centroid = []
+    max_i = 0
     for i in range(len(centroids)):
         dist_x = 0
         dist_y = 0
@@ -98,7 +103,8 @@ def GetBiggestCentroid(hull):
         if cur_avg > max_avg:
             max_avg = cur_avg
             biggest_centroid = [x_centroid, y_centroid]
-    return biggest_centroid
+            max_i = i
+    return biggest_centroid, max_i
 
 def ErodeImg(img):
     kernel1Size_x = 2
