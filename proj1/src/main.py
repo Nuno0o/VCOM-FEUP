@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 
 img = gui.Menu()
 img = algorithm.ResizeImage(img)
+img = algorithm.NormalizeLight(img)
 img = algorithm.SmoothImage(img)
 img = algorithm.ConvertToHSV(img)
 img = algorithm.DetectHands(img)

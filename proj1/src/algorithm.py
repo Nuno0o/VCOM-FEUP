@@ -226,4 +226,15 @@ def GetRectSection(img,tl,br):
     roi = clone[tl[1]:br[1],tl[0]:br[0]]
     imshow("cropped rectangle", roi)
 
+def NormalizeLight(img):
+    avg_color = [img[:, :, i].mean() for i in range(img.shape[-1])]
+    avg_color[0] = avg_color[0]*0.2
+    avg_color[1] = avg_color[1]
+    avg_color[2] = avg_color[2]*0.2
+    for x in range(0,img.shape[0]):
+        for y in range(0,img.shape[1]):
+            img[y][x] = img[y][x]-avg_color
+    imshow("redness", img)
+    return img
+
 
