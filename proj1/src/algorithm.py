@@ -21,37 +21,36 @@ def ConvertToHSV(img):
     return hsv
 
 def DetectHands(img):
+    #for human hands, HSV =~ (0-50, 40-180, 50-255)
     x_min = 0
     x_max = 50
     y_min = 40
     y_max = 180
-    z_min = 50
+    z_min = 20
     z_max = 255
     ranges = inRange(img, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
+
     #apply median blur to remove small components
-    #ranges = medianBlur(ranges, ksize=9)
-    #find all your connected components (white blobs in your image)
-    '''nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(ranges, connectivity=8)
-    print(stats)
+    ranges = medianBlur(ranges, ksize=9)
+
+    #find small components not caught by median blur
+    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(ranges, connectivity=4)
     #connectedComponentswithStats yields every seperated component with information on each of them, such as size
     #the following part is just taking out the background which is also considered a component, but most of the time we don't want that.
-    sizes = stats[1:, -1]; 
+    #remove background
     nb_components = nb_components - 1
     stats2 = stats[1:]
-    print(stats2)
-
     # minimum size of particles we want to keep (number of pixels)
     #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
-    min_size = 150  
-
+    min_size = 70*70 
     #your answer image
-    img2 = np.zeros((output.shape))
+    img2 = np.zeros((output.shape),np.uint8)
     #for every component in the image, you keep it only if it's above min_size
     for i in range(0, nb_components):
-        if sizes[i] >= min_size:
+        if stats2[i][4] >= min_size:
             img2[output == i + 1] = 255
-    '''
-    return ranges
+
+    return img2
 
 def DetectGestures(img):
     _, contours, hierarchy = findContours(img, RETR_TREE, CHAIN_APPROX_SIMPLE)
