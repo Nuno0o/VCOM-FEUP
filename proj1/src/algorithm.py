@@ -84,7 +84,6 @@ def DetectGestures(img):
     peaks = GetPeaks(biggest_centroid, hull[bc_index])
     for i in range(len(peaks)):
         drawing[peaks[i][1]][peaks[i][0]] = color_peaks
-    print(peaks)
 
     return drawing
 
@@ -137,9 +136,29 @@ def GetPeaks(centroid, points):
         if (centroid[1] - points[i][0][1]) >= 0.75 * max_peak:
             peaks.append(points[i][0])
 
+    GetPeakPlot(centroid, peaks)
+
     return peaks
 
-def GetPeakHistogram(centroid, peaks):
+def GetPeakPlot(centroid, peaks):
+    N = len(peaks)
+    peaksx = []
+    peaksy = []
+
+    for i in range(N):
+        peaksx.append(peaks[i][0])
+        peaksy.append(peaks[i][1])
+    
+    colors = (0,0,0)
+    area = np.pi*3
+
+    plt.scatter(peaksx, peaksy, s=area, c=colors, alpha=0.5)
+    plt.title('Scatter Plot of Peaks')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.gca().invert_yaxis()
+    #plt.show()
+
     return centroid
 
 def ErodeImg(img):
