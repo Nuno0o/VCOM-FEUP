@@ -65,16 +65,15 @@ def DetectGestures(img):
     color = (255,0,0)
 
     for i in range(len(contours)):
-        hull.append(convexHull(contours[i],False))
+        hull.append(RemoveRepeatedPoints(convexHull(contours[i],False)))
+    print(hull)
     drawing = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
     biggest_centroid, bc_index = GetBiggestCentroid(hull)
 
     if biggest_centroid == []:
         return img
-
-    newhull = RemoveRepeatedPoints(hull[bc_index])
     
-    peaks = GetPeaks(biggest_centroid, newhull)
+    peaks = GetPeaks(biggest_centroid, hull[bc_index])
 
     # Draw Centroid
     drawing[biggest_centroid[1]][biggest_centroid[0]] = color_centroids
@@ -116,7 +115,7 @@ def RemoveRepeatedPoints(hull):
             groups.append(current_group[round(len(current_group)/2)])
             current_group = []
             current_group.append(hull[i])
-    return groups
+    return np.array(groups, dtype=np.int32)
 
 def GetCentroid(hull):
     centroids = []
