@@ -10,7 +10,7 @@ def SmoothImage(img):
     return blur
 
 def ResizeImage(img):
-    img2 = resize(img, (400,400))
+    img2 = resize(img, (400,500))
     return img2
 
 def ConvertToYCrCb(img):
@@ -58,6 +58,7 @@ def DetectHands(img):
     return ranges
 
 def DetectGestures(img):
+
     _, contours, hierarchy = findContours(img, RETR_TREE, CHAIN_APPROX_SIMPLE)
     hull = []
     color_centroids = (255,255,255)
@@ -91,6 +92,19 @@ def DetectGestures(img):
 
     for i in range(len(peaks)):
         drawing[peaks[i][1]][peaks[i][0]] = color_peaks
+
+    window_x, window_y, window_size_x, window_size_y = GetWindowSize(hull[bc_index], len(peaks) + 1)
+
+    thumb = False
+    for i in range(0, len(peaks)+1):
+        thumb = GetThumb(img, i*window_size_x + window_x, window_y, window_size_x, window_size_y)
+        if thumb:
+            break
+
+    thumbStr = 'NO'
+    if thumb: 
+        thumbStr = 'A RAISED'
+    print('DETECTED ' + str(len(peaks)) + ' FINGERS RAISED AND ' + thumbStr + ' THUMB')
 
     return drawing
 
@@ -170,11 +184,8 @@ def GetPeaks(centroid, points):
     max_peak = 0
     for i in range(len(points)):
         if points[i][0][1] < centroid[1]:
-            print(points[i][0][1], centroid[1], max_peak)
             if abs(points[i][0][1] - centroid[1]) > max_peak:
                 max_peak = abs(points[i][0][1] - centroid[1])
-    
-    print(max_peak)
 
     for i in range(len(points)):
         if (centroid[1] - points[i][0][1]) >= 0.3 * max_peak:
@@ -204,6 +215,48 @@ def GetPeakPlot(centroid, peaks):
     #plt.show()
 
     return centroid
+
+def GetWhitePixelCount(img):
+    count = 0
+    height, width  = img.shape[0], img.shape[1]
+    for y in range(height):
+        for x in range(width):
+            if img[y][x] == 255:
+                count += 1
+    return count
+
+def GetThumb(img, window_x, window_y, window_size_x, window_size_y):
+    totalCount = GetWhitePixelCount(img)
+    count = 0
+
+    for y in range(window_y, window_y + window_size_y):
+        for x in range(window_x, window_x + window_size_x):
+            if img[y][x] == 255:
+                count += 1
+
+    if count < 0.069 * totalCount:
+        return True
+    return False
+
+def GetWindowSize(points, npeaks):
+    min_x = 99999
+    min_y = 99999
+
+    max_x = 0
+    max_y = 0
+
+    for i in range(len(points)):
+        if points[i][0][0] > max_x:
+            max_x = points[i][0][0]
+        if points[i][0][1] > max_y:
+            max_y = points[i][0][1]
+        if points[i][0][0] < min_x:
+            min_x = points[i][0][0]
+        if points[i][0][1] < min_y:
+            min_y = points[i][0][1]
+
+    # window_x, window_y, window_size_x, window_size_y
+    return min_x, min_y, int((max_x - min_x) / npeaks), max_y - min_y
 
 def ErodeImg(img):
     kernel1Size_x = 2
@@ -280,7 +333,7 @@ def NormalizeLight(img):
         for y in range(0,img.shape[1]):
             img[y][x] = img[y][x]-avg_color
     imshow("redness", img)'''
-    normalizedimg = np.zeros((400,400))
+    normalizedimg = np.zeros((400,500))
     normalizedimg = normalize(img, normalizedimg, 50 , 190, NORM_MINMAX)
     return normalizedimg
 
