@@ -2,6 +2,7 @@ import algorithm
 import parseargs
 from cv2 import *
 from matplotlib import pyplot as plt
+import sys
 
 img = parseargs.parseArgs()
 if img is None:
@@ -26,4 +27,5 @@ for i in range(0, len(imgs)):
 #br = [x2,y2]
 #algorithm.GetRectSection(img,tl,br)
 #print(x1, " ", y1, " ", x2, " ", y2) 
+sys.stdout.flush() 
 waitKey(0)
