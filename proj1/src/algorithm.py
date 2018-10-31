@@ -113,7 +113,7 @@ def RemoveRepeatedPoints(hull):
         return hull
     groups = []
     current_group = []
-    max_dist = 20
+    max_dist = 30
     for i in range(0, len(hull)):
         if len(current_group) == 0:
             current_group.append(hull[i])
