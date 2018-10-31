@@ -67,7 +67,7 @@ def DetectGestures(img):
 
     for i in range(len(contours)):
         hull.append(RemoveRepeatedPoints(convexHull(contours[i],False)))
-    print(hull)
+
     drawing = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
     biggest_centroid, bc_index = GetBiggestCentroid(hull)
 
@@ -132,6 +132,7 @@ def GetCentroid(hull):
     for h in hull:
         x = []
         y = []
+
         for point in h:
             x.append(point[0][0])
             y.append(point[0][1])
@@ -169,11 +170,14 @@ def GetPeaks(centroid, points):
     max_peak = 0
     for i in range(len(points)):
         if points[i][0][1] < centroid[1]:
-            if points[i][0][1] > max_peak:
+            print(points[i][0][1], centroid[1], max_peak)
+            if abs(points[i][0][1] - centroid[1]) > max_peak:
                 max_peak = abs(points[i][0][1] - centroid[1])
     
+    print(max_peak)
+
     for i in range(len(points)):
-        if (centroid[1] - points[i][0][1]) >= 0.75 * max_peak:
+        if (centroid[1] - points[i][0][1]) >= 0.3 * max_peak:
             peaks.append(points[i][0])
 
     GetPeakPlot(centroid, peaks)
