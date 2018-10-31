@@ -117,7 +117,14 @@ def RemoveRepeatedPoints(hull):
             current_group = []
             current_group.append(hull[i])
     if len(current_group) > 0:
-        groups.append(current_group[math.floor(len(current_group)/2)])
+        currx = hull[0][0][0]
+        curry = hull[0][0][1]
+        latestx = current_group[len(current_group)-1][0][0]
+        latesty = current_group[len(current_group)-1][0][1]
+        if len(groups) > 0 and abs(abs(currx - latestx) + abs(curry - latesty)) >= max_dist:
+            groups.append(current_group[math.floor(len(current_group)/2)])
+        elif len(groups) == 0:
+            groups.append(current_group[math.floor(len(current_group)/2)])
     return np.array(groups, dtype=np.int32)
 
 def GetCentroid(hull):
