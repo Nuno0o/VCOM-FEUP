@@ -1,6 +1,7 @@
 from cv2 import *
 import numpy as np
 from matplotlib import pyplot as plt
+import math
 
 np.set_printoptions(threshold=np.nan)
 
@@ -108,13 +109,15 @@ def RemoveRepeatedPoints(hull):
         latestx = current_group[len(current_group)-1][0][0]
         latesty = current_group[len(current_group)-1][0][1]
         #do manhattan distance to check if points are close
-        if (abs(currx - latestx) + abs(curry - latesty)) < max_dist:
+        if abs(abs(currx - latestx) + abs(curry - latesty)) < max_dist:
             current_group.append(hull[i])
         #discard close points and keep only the one in the center
         else:
-            groups.append(current_group[round(len(current_group)/2)])
+            groups.append(current_group[math.floor(len(current_group)/2)])
             current_group = []
             current_group.append(hull[i])
+    if len(current_group) > 0:
+        groups.append(current_group[math.floor(len(current_group)/2)])
     return np.array(groups, dtype=np.int32)
 
 def GetCentroid(hull):
