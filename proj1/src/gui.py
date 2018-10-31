@@ -1,5 +1,5 @@
 from cv2 import *
-import camera
+#import camera
 
 def Menu():
     print('--------- HAND GESTURE DETECTION TOOL ----------\n')

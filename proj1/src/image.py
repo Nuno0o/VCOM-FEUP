@@ -19,3 +19,8 @@ def CaptureCameraImage():
     cap.release()
     #destroyAllWindows()
     return img
+"""Reads image from input file
+"""
+def ReadImageFile(path):
+    img = imread(path)
+    return img

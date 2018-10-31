@@ -35,7 +35,7 @@ def DetectHands(img):
     z_max = 255
     ranges = inRange(img, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
 
-    #apply median blur to remove small components
+    #apply median blur to remove small dots
     ranges = medianBlur(ranges, ksize=9)
 
     #find small components not caught by median blur
@@ -47,15 +47,19 @@ def DetectHands(img):
     stats2 = stats[1:]
     # minimum size of particles we want to keep (number of pixels)
     #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
-    min_size = 150
+    min_size = 5000
+
+    imgs = []
     #your answer image
-    img2 = np.zeros((output.shape),np.uint8)
+    #img2 = np.zeros((output.shape),np.uint8)
     #for every component in the image, you keep it only if it's above min_size
     for i in range(0, nb_components):
         if stats2[i][4] >= min_size:
-            img2[output == i + 1] = 255
+            hand = np.zeros((output.shape),np.uint8)
+            hand[output == i + 1] = 255
+            imgs.append(hand)
 
-    return ranges
+    return imgs
 
 def DetectGestures(img):
 
