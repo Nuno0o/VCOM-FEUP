@@ -93,7 +93,7 @@ def DetectGestures(img):
     for i in range(len(peaks)):
         drawing[peaks[i][1]][peaks[i][0]] = color_peaks
 
-    window_x, window_y, window_size_x, window_size_y = GetWindowSize(hull[bc_index], len(peaks) + 1)
+    window_x, window_y, window_size_x, window_size_y = GetWindowSize(hull[bc_index], len(peaks) + 2)
 
     thumb = False
     for i in range(0, len(peaks)+1):
