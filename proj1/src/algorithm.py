@@ -20,13 +20,17 @@ def ConvertToHSV(img):
     hsv = cvtColor(img, COLOR_BGR2HSV)
     return hsv
 
+def EdgeDetection(img):
+    edge = Canny(img,120,140)
+    return edge
+
 def DetectHands(img):
     #for human hands, HSV =~ (0-50, 40-180, 50-255)
     x_min = 0
-    x_max = 50
-    y_min = 40
-    y_max = 180
-    z_min = 20
+    x_max = 30
+    y_min = 20
+    y_max = 173
+    z_min = 40
     z_max = 255
     ranges = inRange(img, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
 
@@ -42,7 +46,7 @@ def DetectHands(img):
     stats2 = stats[1:]
     # minimum size of particles we want to keep (number of pixels)
     #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
-    min_size = 70*70 
+    min_size = 150
     #your answer image
     img2 = np.zeros((output.shape),np.uint8)
     #for every component in the image, you keep it only if it's above min_size
@@ -50,12 +54,11 @@ def DetectHands(img):
         if stats2[i][4] >= min_size:
             img2[output == i + 1] = 255
 
-    return img2
+    return ranges
 
 def DetectGestures(img):
     _, contours, hierarchy = findContours(img, RETR_TREE, CHAIN_APPROX_SIMPLE)
     hull = []
-
     color_centroids = (255,255,255)
     color_peaks = (0,0,255)
     color_contours = (0,255,0)
@@ -64,8 +67,14 @@ def DetectGestures(img):
     for i in range(len(contours)):
         hull.append(convexHull(contours[i],False))
     drawing = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
-
     biggest_centroid, bc_index = GetBiggestCentroid(hull)
+
+    if biggest_centroid == []:
+        return img
+
+    newhull = RemoveRepeatedPoints(hull[bc_index])
+    
+    peaks = GetPeaks(biggest_centroid, newhull)
 
     # Draw Centroid
     drawing[biggest_centroid[1]][biggest_centroid[0]] = color_centroids
@@ -80,11 +89,34 @@ def DetectGestures(img):
     drawContours(drawing,contours,bc_index,color_contours,1,8,hierarchy)
     drawContours(drawing,hull,bc_index,color,1,8)
 
-    peaks = GetPeaks(biggest_centroid, hull[bc_index])
     for i in range(len(peaks)):
         drawing[peaks[i][1]][peaks[i][0]] = color_peaks
 
     return drawing
+
+def RemoveRepeatedPoints(hull):
+    if len(hull) == 1:
+        return hull
+    groups = []
+    current_group = []
+    max_dist = 20
+    for i in range(0, len(hull)):
+        if len(current_group) == 0:
+            current_group.append(hull[i])
+            continue
+        currx = hull[i][0][0]
+        curry = hull[i][0][1]
+        latestx = current_group[len(current_group)-1][0][0]
+        latesty = current_group[len(current_group)-1][0][1]
+        #do manhattan distance to check if points are close
+        if (abs(currx - latestx) + abs(curry - latesty)) < max_dist:
+            current_group.append(hull[i])
+        #discard close points and keep only the one in the center
+        else:
+            groups.append(current_group[round(len(current_group)/2)])
+            current_group = []
+            current_group.append(hull[i])
+    return groups
 
 def GetCentroid(hull):
     centroids = []
@@ -227,14 +259,16 @@ def GetRectSection(img,tl,br):
     imshow("cropped rectangle", roi)
 
 def NormalizeLight(img):
-    avg_color = [img[:, :, i].mean() for i in range(img.shape[-1])]
+    '''avg_color = [img[:, :, i].mean() for i in range(img.shape[-1])]
     avg_color[0] = avg_color[0]*0.2
     avg_color[1] = avg_color[1]
     avg_color[2] = avg_color[2]*0.2
     for x in range(0,img.shape[0]):
         for y in range(0,img.shape[1]):
             img[y][x] = img[y][x]-avg_color
-    imshow("redness", img)
-    return img
+    imshow("redness", img)'''
+    normalizedimg = np.zeros((400,400))
+    normalizedimg = normalize(img, normalizedimg, 50 , 190, NORM_MINMAX)
+    return normalizedimg
 
 

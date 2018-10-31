@@ -13,7 +13,7 @@ img = algorithm.DetectHands(img)
 img2 = algorithm.DetectGestures(img)
 imshow("Skin",img)
 imshow("Contours",img2)
-#plt.show()
+plt.show()
 
 #img2 = algorithm.ErodeImg(img)
 #imshow("Eroded", img2)
