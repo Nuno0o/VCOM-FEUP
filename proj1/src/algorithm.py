@@ -105,12 +105,7 @@ def DetectGestures(img):
         if thumb:
             break
 
-    thumbStr = 'NO'
-    if thumb: 
-        thumbStr = 'A RAISED'
-    print('DETECTED ' + str(len(peaks)) + ' FINGERS RAISED AND ' + thumbStr + ' THUMB')
-
-    return drawing
+    return drawing, len(peaks), thumb
 
 def RemoveRepeatedPoints(hull):
     if len(hull) == 1:
