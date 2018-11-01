@@ -50,17 +50,21 @@ def DetectHands(img):
         if stats[i][4] > biggestone:
             biggesti = i
             biggestone = stats[i][4]
-    np.delete(stats,i)
+    newstats = []
+    for i in range(0, len(stats)):
+        if i != biggesti:
+            newstats.append(stats[i])
+    newstats = np.array(newstats)
+
     # minimum size of particles we want to keep (number of pixels)
     #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
-    min_size = 5000
-
+    min_size = 150*150
     imgs = []
     #your answer image
     #img2 = np.zeros((output.shape),np.uint8)
     #for every component in the image, you keep it only if it's above min_size
     for i in range(0, nb_components):
-        if stats[i][4] >= min_size:
+        if newstats[i][4] >= min_size:
             hand = np.zeros((output.shape),np.uint8)
             hand[output == i + 1] = 255
             imgs.append(hand)
