@@ -326,7 +326,7 @@ def GetRectSection(img,tl,br):
     #rectangle(img, (x1,y1), (x2,y2), 128, 1)
     clone = img.copy()
     roi = clone[tl[1]:br[1],tl[0]:br[0]]
-    imshow("cropped rectangle", roi)
+    return roi
 
 def NormalizeLight(img):
     '''avg_color = [img[:, :, i].mean() for i in range(img.shape[-1])]

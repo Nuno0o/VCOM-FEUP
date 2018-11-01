@@ -14,7 +14,12 @@ img = algorithm.SmoothImage(img)
 img = algorithm.ConvertToHSV(img)
 imgs = algorithm.DetectHands(img)
 for i in range(0, len(imgs)):
-    img2 = algorithm.DetectGestures(imgs[i])
+    x1,y1,x2,y2 = algorithm.GetRectEdges(imgs[i])
+    tl = [x1,y1]
+    br = [x2,y2]
+    print(x1,y1,x2,y2)  
+    img3 = algorithm.GetRectSection(imgs[i], tl, br)
+    img2 = algorithm.DetectGestures(img3)
     imshow("Contours"+str(i),img2)
 #imshow("Skin",img)
 #plt.show()
