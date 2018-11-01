@@ -68,7 +68,6 @@ def DetectHands(img):
     return imgs
 
 def DetectGestures(img):
-
     _, contours, hierarchy = findContours(img, RETR_TREE, CHAIN_APPROX_SIMPLE)
     hull = []
     color_centroids = (255,255,255)
@@ -84,9 +83,7 @@ def DetectGestures(img):
 
     if biggest_centroid == []:
         return img
-    
     peaks = GetPeaks(biggest_centroid, hull[bc_index])
-
     # Draw Centroid
     drawing[biggest_centroid[1]][biggest_centroid[0]] = color_centroids
     # To see it slightly better, draw pixels around it in same color
@@ -191,27 +188,22 @@ def GetPeaks(centroid, points):
         if points[i][0][1] < centroid[1]:
             if abs(points[i][0][1] - centroid[1]) > max_peak:
                 max_peak = abs(points[i][0][1] - centroid[1])
-
     for i in range(len(points)):
         if (centroid[1] - points[i][0][1]) >= 0.3 * max_peak:
             peaks.append(points[i][0])
-
     GetPeakPlot(centroid, peaks)
-
     return peaks
 
 def GetPeakPlot(centroid, peaks):
     N = len(peaks)
     peaksx = []
     peaksy = []
-
     for i in range(N):
         peaksx.append(peaks[i][0])
         peaksy.append(peaks[i][1])
     
-    colors = (0,0,0)
+    colors = [[0,0,0]]
     area = np.pi*3
-
     plt.scatter(peaksx, peaksy, s=area, c=colors, alpha=0.5)
     plt.title('Scatter Plot of Peaks')
     plt.xlabel('x')
