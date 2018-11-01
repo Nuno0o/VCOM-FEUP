@@ -17,7 +17,7 @@ def CaptureCameraImage():
         if key == esc_key:
             break
     cap.release()
-    #destroyAllWindows()
+    destroyAllWindows()
     return img
 """Reads image from input file
 """

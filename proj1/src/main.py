@@ -13,6 +13,8 @@ img = algorithm.NormalizeLight(img)
 img = algorithm.SmoothImage(img)
 img = algorithm.ConvertToHSV(img)
 imgs = algorithm.DetectHands(img)
+if len(imgs) == 0:
+    print('No hands detected')
 for i in range(0, len(imgs)):
     x1,y1,x2,y2 = algorithm.GetRectEdges(imgs[i])
     tl = [x1,y1]

@@ -44,7 +44,13 @@ def DetectHands(img):
     #the following part is just taking out the background which is also considered a component, but most of the time we don't want that.
     #remove background
     nb_components = nb_components - 1
-    stats2 = stats[1:]
+    biggestone = -1
+    biggesti = -1
+    for i in range(0, len(stats)):
+        if stats[i][4] > biggestone:
+            biggesti = i
+            biggestone = stats[i][4]
+    np.delete(stats,i)
     # minimum size of particles we want to keep (number of pixels)
     #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
     min_size = 5000
@@ -54,7 +60,7 @@ def DetectHands(img):
     #img2 = np.zeros((output.shape),np.uint8)
     #for every component in the image, you keep it only if it's above min_size
     for i in range(0, nb_components):
-        if stats2[i][4] >= min_size:
+        if stats[i][4] >= min_size:
             hand = np.zeros((output.shape),np.uint8)
             hand[output == i + 1] = 255
             imgs.append(hand)
