@@ -264,14 +264,10 @@ def GetWindowSize(points, npeaks):
     return min_x, min_y, int((max_x - min_x) / npeaks), max_y - min_y
 
 def ErodeImg(img):
-    kernel1Size_x = 2
-    kernel1Size_y = 2
-    kernel2Size_x = 3
-    kernel2Size_y = 3
+    kernel1Size_x = 3
+    kernel1Size_y = 3
     kernel = np.ones((kernel1Size_x,kernel1Size_y),np.uint8)
-    kernel2 = np.ones((kernel2Size_x,kernel2Size_y),np.uint8)
-    #erosion = erode(img, kernel, iterations=3)
-    #erosion = dilate(erosion,kernel2, iterations=4)
+    erosion = erode(img, kernel, iterations=3)
 
     return erosion
 

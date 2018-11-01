@@ -11,6 +11,7 @@ if img is None:
 img = algorithm.ResizeImage(img)
 img = algorithm.NormalizeLight(img)
 img = algorithm.SmoothImage(img)
+img = algorithm.ErodeImg(img)
 img = algorithm.ConvertToHSV(img)
 imgs = algorithm.DetectHands(img)
 if len(imgs) == 0:
