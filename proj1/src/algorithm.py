@@ -82,7 +82,7 @@ def DetectGestures(img):
     biggest_centroid, bc_index = GetBiggestCentroid(hull)
 
     if biggest_centroid == []:
-        return img
+        return img, 0, False
     peaks = GetPeaks(biggest_centroid, hull[bc_index])
     # Draw Centroid
     drawing[biggest_centroid[1]][biggest_centroid[0]] = color_centroids
@@ -108,7 +108,8 @@ def DetectGestures(img):
         if thumb:
             break
 
-    return drawing, len(peaks), thumb
+    nfingers = len(peaks)
+    return drawing, nfingers, thumb
 
 def RemoveRepeatedPoints(hull):
     if len(hull) == 1:
