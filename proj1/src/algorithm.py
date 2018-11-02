@@ -63,29 +63,23 @@ def nmax(x1,x2):
 def nmin(x1,x2):
     return x1 if x1 < x2 else x2
 
-def TR1(R,G,B):
-    e1 = R>95 and G>40 and B>20 and (int(nmax(R,nmax(G,B))) - int(nmin(R, nmin(G,B))))>15 and abs(int(R)-int(G))>15 and R>G and R>B
-    e2 = R>220 and G>210 and B>170 and abs(int(R)-int(G))<=15 and R>B and G>B
-    return e1 or e2
+def TR1(R,G,B,Y,Cr,Cb,H,S,V):
+    bol = (H > 0 and H < 50) and (S > 58 and S < 173) and R > 95 and G > 40 and B > 20 and R > G and R > B and abs(int(R) - int(G)) > 15
+    return bol
 
-def TR2(Y,Cr,Cb):
-    e3 = Cr <= 1.5862*Cb+20;
-    e4 = Cr >= 0.3448*Cb+76.2069;
-    e5 = Cr >= -4.5652*Cb+234.5652;
-    e6 = Cr <= -1.15*Cb+301.75;
-    e7 = Cr <= -2.2857*Cb+432.85;
-    return e3 and e4 and e5 and e6 and e7
+def TR2(R,G,B,Y,Cr,Cb,H,S,V):
+    bol = R > 95 and G > 40 and B > 20 and R > G and R > B and abs(int(R) - int(G)) > 15 and Cr > 135 and Cb > 85 and Y > 80 and Cr <= (1.5862*Cb)+20 and Cr>=(0.3448*Cb)+76.2069
+    bol2 = Cr >= (-4.5652*Cb)+234 and Cr <= (-1.15*Cb)+301 and Cr <= (-2.2857*Cb)+432
+    return bol and bol2
 
-def TR3(H,S,V):
-    return (H < 35) or (H >162)
 
 def GetSkinEasy(img):
     img2 = cvtColor(img, COLOR_BGR2HSV)
     x_min = 0
-    x_max = 30
-    y_min = 20
+    x_max = 25
+    y_min = 58
     y_max = 173
-    z_min = 40
+    z_min = 60
     z_max = 255
     ranges = inRange(img2, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
     return ranges
@@ -103,21 +97,19 @@ def GetSkin(img):
             g = rgb[y][x][1]
             b = rgb[y][x][0]
 
-            tr1 = TR1(r,g,b)
-
             Y = ycrcb[y][x][0]
             cr= ycrcb[y][x][1]
             cb= ycrcb[y][x][2]
-
-            tr2 = TR2(Y,cr,cb)
 
             h = hsv[y][x][0]
             s = hsv[y][x][1]
             v = hsv[y][x][2]
 
-            tr3 = TR3(h,s,v)
+            tr1 = TR1(r,g,b, Y, cr,cb,h,s,v)
 
-            if tr1 and tr2 and tr3:
+            tr2 = TR2(r,g,b, Y, cr,cb,h,s,v)
+
+            if tr1 or tr2:
                 dest[y][x] = 255
     return dest
 
@@ -167,7 +159,6 @@ def DetectGestures(img):
         window_size_y = img.shape[0]
         
         for i in range(0, 5):
-            print(i)
             thumb = GetThumb(img, i*window_size_x + window_x, window_y, window_size_x, window_size_y, len(peaks))
             if thumb:
                 break
@@ -368,7 +359,6 @@ def GetThumb(img, window_x, window_y, window_size_x, window_size_y, npeaks):
                 count += 1
 
     per = 0.0069 + 0.2 * abs((1 - npeaks) / 5)
-    print(per)
     if count < per * totalCount:
         return True
     return False
@@ -454,18 +444,4 @@ def GetRectSection(img,tl,br):
     clone = img.copy()
     roi = clone[tl[1]:br[1],tl[0]:br[0]]
     return roi
-
-def NormalizeLight(img):
-    '''avg_color = [img[:, :, i].mean() for i in range(img.shape[-1])]
-    avg_color[0] = avg_color[0]*0.2
-    avg_color[1] = avg_color[1]
-    avg_color[2] = avg_color[2]*0.2
-    for x in range(0,img.shape[0]):
-        for y in range(0,img.shape[1]):
-            img[y][x] = img[y][x]-avg_color
-    imshow("redness", img)'''
-    normalizedimg = np.zeros((400,500))
-    normalizedimg = normalize(img, normalizedimg, 50 , 190, NORM_MINMAX)
-    return normalizedimg
-
 

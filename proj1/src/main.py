@@ -25,7 +25,6 @@ if img is None:
     quit()
 
 img = algorithm.ResizeImage(img)
-#img = algorithm.NormalizeLight(img)
 img = algorithm.SmoothImage(img)
 img = algorithm.ErodeImg(img)
 imgs = algorithm.DetectHands(img, args.adv)
