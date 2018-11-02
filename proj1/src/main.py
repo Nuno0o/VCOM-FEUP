@@ -26,7 +26,6 @@ if img is None:
 
 img = algorithm.ResizeImage(img)
 img = algorithm.SmoothImage(img)
-img = algorithm.ErodeImg(img)
 imgs = algorithm.DetectHands(img, args.adv)
 if len(imgs) == 0:
     print('No hands detected')

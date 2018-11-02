@@ -13,6 +13,14 @@ def ResizeImage(img):
     img2 = resize(img, (400,400))
     return img2
 
+def ErodeAndDilateImg(img):
+    kernel1Size_x = 3
+    kernel1Size_y = 3
+    kernel = np.ones((kernel1Size_x,kernel1Size_y),np.uint8)
+    erosion = erode(img, kernel, iterations=3)
+    dilation = dilate(img, kernel, iterations=3)
+    return erosion
+
 def DetectHands(img, advanced=False):
     ranges = None
 
@@ -20,6 +28,8 @@ def DetectHands(img, advanced=False):
         ranges = GetSkin(img)
     else:
         ranges = GetSkinEasy(img)
+
+    #ranges = ErodeAndDilateImg(ranges)
 
     #apply median blur to remove small dots
     ranges = medianBlur(ranges, ksize=9)
@@ -57,6 +67,17 @@ def DetectHands(img, advanced=False):
 
     return imgs
 
+def GetSkinEasy(img):
+    img2 = cvtColor(img, COLOR_BGR2HSV)
+    x_min = 0
+    x_max = 35
+    y_min = 42
+    y_max = 173
+    z_min = 60
+    z_max = 255
+    ranges = inRange(img2, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
+    return ranges
+
 def nmax(x1,x2):
     return x1 if x1 > x2 else x2
 
@@ -71,18 +92,6 @@ def TR2(R,G,B,Y,Cr,Cb,H,S,V):
     bol = R > 95 and G > 40 and B > 20 and R > G and R > B and abs(int(R) - int(G)) > 15 and Cr > 135 and Cb > 85 and Y > 80 and Cr <= (1.5862*Cb)+20 and Cr>=(0.3448*Cb)+76.2069
     bol2 = Cr >= (-4.5652*Cb)+234 and Cr <= (-1.15*Cb)+301 and Cr <= (-2.2857*Cb)+432
     return bol and bol2
-
-
-def GetSkinEasy(img):
-    img2 = cvtColor(img, COLOR_BGR2HSV)
-    x_min = 0
-    x_max = 25
-    y_min = 58
-    y_max = 173
-    z_min = 60
-    z_max = 255
-    ranges = inRange(img2, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
-    return ranges
 
 def GetSkin(img):
     rgb = img.copy()
@@ -382,19 +391,6 @@ def GetWindowSize(points, npeaks):
 
     # window_x, window_y, window_size_x, window_size_y
     return min_x, min_y, int((max_x - min_x) / npeaks), max_y - min_y
-
-def ErodeImg(img):
-    kernel1Size_x = 3
-    kernel1Size_y = 3
-    kernel = np.ones((kernel1Size_x,kernel1Size_y),np.uint8)
-    erosion = erode(img, kernel, iterations=3)
-
-    return erosion
-
-def ConvertToBinary(img):
-    y,cb,cr = split(img)
-    _,binary = threshold(y,127,255,THRESH_BINARY_INV + THRESH_OTSU)
-    return binary
 
 def SweepTopBottom(img):
     height, width = img.shape[0], img.shape[1]
