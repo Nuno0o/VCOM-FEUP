@@ -316,7 +316,7 @@ def GetThumb(img, window_x, window_y, window_size_x, window_size_y, npeaks):
             if img[y][x] == 255:
                 count += 1
 
-    per = 0.0069 + 0.13 * abs((1 - npeaks) / 5)
+    per = 0.0069 + 0.2 * abs((1 - npeaks) / 5)
     print(per)
     if count < per * totalCount:
         return True
