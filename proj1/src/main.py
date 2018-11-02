@@ -40,5 +40,6 @@ for i in range(0, len(imgs)):
     strthumb = 'a raised thumb' if thumb else 'no thumb'
     print('Hand ' + str(i) + ' with ' + str(fingers) + ' ' + strfingers + ' and ' + strthumb)
     imshow('Hand ' + str(i),hand)
-sys.stdout.flush() 
-waitKey(0)
+sys.stdout.flush()
+if len(imgs) > 0:
+    waitKey(0)
