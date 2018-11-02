@@ -9,7 +9,7 @@ import image
 parser = argparse.ArgumentParser(description="Detect number of fingers in hands from image file or camera")
 parser.add_argument('method' ,help='\'camera\' or \'file\'', type=str)
 parser.add_argument('-i', '--image', dest='path', default='img.jpg',type=str)
-
+parser.add_argument('-a', '--advanced', dest='adv', action='store_true')
 img = None
 
 args = parser.parse_args()
@@ -28,7 +28,7 @@ img = algorithm.ResizeImage(img)
 #img = algorithm.NormalizeLight(img)
 img = algorithm.SmoothImage(img)
 img = algorithm.ErodeImg(img)
-imgs = algorithm.DetectHands(img)
+imgs = algorithm.DetectHands(img, args.adv)
 if len(imgs) == 0:
     print('No hands detected')
 for i in range(0, len(imgs)):

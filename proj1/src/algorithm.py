@@ -13,17 +13,13 @@ def ResizeImage(img):
     img2 = resize(img, (400,400))
     return img2
 
-def DetectHands(img):
-    '''img = ConvertToHSV(img)
-    #for human hands, HSV =~ (0-50, 40-180, 50-255)
-    x_min = 0
-    x_max = 30
-    y_min = 20
-    y_max = 173
-    z_min = 40
-    z_max = 255
-    ranges = inRange(img, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))'''
-    ranges = GetSkin(img)
+def DetectHands(img, advanced=False):
+    ranges = None
+
+    if advanced:
+        ranges = GetSkin(img)
+    else:
+        ranges = GetSkinEasy(img)
 
     #apply median blur to remove small dots
     ranges = medianBlur(ranges, ksize=9)
@@ -83,6 +79,17 @@ def TR2(Y,Cr,Cb):
 def TR3(H,S,V):
     return (H < 35) or (H >162)
 
+def GetSkinEasy(img):
+    img2 = cvtColor(img, COLOR_BGR2HSV)
+    x_min = 0
+    x_max = 30
+    y_min = 20
+    y_max = 173
+    z_min = 40
+    z_max = 255
+    ranges = inRange(img2, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
+    return ranges
+
 def GetSkin(img):
     rgb = img.copy()
     hsv = cvtColor(img, COLOR_BGR2HSV)
@@ -112,7 +119,6 @@ def GetSkin(img):
 
             if tr1 and tr2 and tr3:
                 dest[y][x] = 255
-    imshow("xD", dest)
     return dest
 
 
