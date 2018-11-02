@@ -109,18 +109,24 @@ def DetectGestures(img):
     window_x = 0
     window_y = 0
 
+    thumb = False
+
     if orientation == 'TOPDOWN' or orientation == 'BOTTOMUP':
         window_size_x = int(math.floor(0.2 * img.shape[1]))
         window_size_y = img.shape[0]
+        
+        for i in range(0, 5):
+            print(i)
+            thumb = GetThumb(img, i*window_size_x + window_x, window_y, window_size_x, window_size_y, len(peaks))
+            if thumb:
+                break
     else:
         window_size_x = img.shape[1]
         window_size_y = int(math.floor(0.2 * img.shape[0]))
-
-    thumb = False
-    for i in range(0, 5):
-        thumb = GetThumb(img, i*window_size_x + window_x, i*window_size_y + window_y, window_size_x, window_size_y)
-        if thumb:
-            break
+        for i in range(0, 5):
+            thumb = GetThumb(img, window_x, i*window_size_y + window_y, window_size_x, window_size_y, len(peaks))
+            if thumb:
+                break
 
     nfingers = len(peaks)
     return drawing, nfingers, thumb
@@ -295,7 +301,7 @@ def GetWhitePixelCount(img):
                 count += 1
     return count
 
-def GetThumb(img, window_x, window_y, window_size_x, window_size_y):
+def GetThumb(img, window_x, window_y, window_size_x, window_size_y, npeaks):
     totalCount = GetWhitePixelCount(img)
     count = 0
 
@@ -310,9 +316,9 @@ def GetThumb(img, window_x, window_y, window_size_x, window_size_y):
             if img[y][x] == 255:
                 count += 1
 
-    # DAR MAIS FOLGA QUANDO TEMOS MAIS DEDOS DETETADOS!
-
-    if count < 0.069 * totalCount:
+    per = 0.0069 + 0.13 * abs((1 - npeaks) / 5)
+    print(per)
+    if count < per * totalCount:
         return True
     return False
 
