@@ -1,13 +1,29 @@
-import algorithm
-import parseargs
+import sys
 from cv2 import *
 from matplotlib import pyplot as plt
-import sys
+import argparse
+import algorithm
+import image
 
-img = parseargs.parseArgs()
+
+parser = argparse.ArgumentParser(description="Detect number of fingers in hands from image file or camera")
+parser.add_argument('method' ,help='\'camera\' or \'file\'', type=str)
+parser.add_argument('-i', '--image', dest='path', default='img.jpg',type=str)
+
+img = None
+
+args = parser.parse_args()
+arg = args.method
+if arg == 'camera':
+    img = image.CaptureCameraImage()
+elif arg == 'file':
+    print('Opening image ' + args.path)
+    img = image.ReadImageFile(args.path)
+
 if img is None:
     print('Image not found')
     quit()
+
 img = algorithm.ResizeImage(img)
 #img = algorithm.NormalizeLight(img)
 img = algorithm.SmoothImage(img)
