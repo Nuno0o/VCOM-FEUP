@@ -36,6 +36,7 @@ for i in range(0, len(imgs)):
     tl = [x1,y1]
     br = [x2,y2]
     segment = algorithm.GetRectSection(imgs[i], tl, br)
+    segment = algorithm.ResizeImage(segment)
     hand, fingers, thumb = algorithm.DetectGestures(segment)
     strfingers = 'finger' if fingers == 1 else 'fingers'
     strthumb = 'a raised thumb' if thumb else 'no thumb'

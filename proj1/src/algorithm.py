@@ -10,7 +10,7 @@ def SmoothImage(img):
     return blur
 
 def ResizeImage(img):
-    img2 = resize(img, (400,500))
+    img2 = resize(img, (400,400))
     return img2
 
 def DetectHands(img):
@@ -48,7 +48,7 @@ def DetectHands(img):
 
     # minimum size of particles we want to keep (number of pixels)
     #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
-    min_size = 150*150
+    min_size = 100*100
     imgs = []
     #your answer image
     #img2 = np.zeros((output.shape),np.uint8)
@@ -181,7 +181,7 @@ def RemoveRepeatedPoints(hull):
         return hull
     groups = []
     current_group = []
-    max_dist = 30
+    max_dist = 70
     for i in range(0, len(hull)):
         if len(current_group) == 0:
             current_group.append(hull[i])
