@@ -9,10 +9,9 @@ if img is None:
     print('Image not found')
     quit()
 img = algorithm.ResizeImage(img)
-img = algorithm.NormalizeLight(img)
+#img = algorithm.NormalizeLight(img)
 img = algorithm.SmoothImage(img)
 img = algorithm.ErodeImg(img)
-img = algorithm.ConvertToHSV(img)
 imgs = algorithm.DetectHands(img)
 if len(imgs) == 0:
     print('No hands detected')

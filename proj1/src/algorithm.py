@@ -13,19 +13,8 @@ def ResizeImage(img):
     img2 = resize(img, (400,500))
     return img2
 
-def ConvertToYCrCb(img):
-    ycrcb = cvtColor(img, COLOR_BGR2YCR_CB)
-    return ycrcb
-
-def ConvertToHSV(img):
-    hsv = cvtColor(img, COLOR_BGR2HSV)
-    return hsv
-
-def EdgeDetection(img):
-    edge = Canny(img,120,140)
-    return edge
-
 def DetectHands(img):
+    '''img = ConvertToHSV(img)
     #for human hands, HSV =~ (0-50, 40-180, 50-255)
     x_min = 0
     x_max = 30
@@ -33,7 +22,8 @@ def DetectHands(img):
     y_max = 173
     z_min = 40
     z_max = 255
-    ranges = inRange(img, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))
+    ranges = inRange(img, np.array([x_min, y_min, z_min]), np.array([x_max, y_max, z_max]))'''
+    ranges = GetSkin(img)
 
     #apply median blur to remove small dots
     ranges = medianBlur(ranges, ksize=9)
@@ -70,6 +60,61 @@ def DetectHands(img):
             imgs.append(hand)
 
     return imgs
+
+def nmax(x1,x2):
+    return x1 if x1 > x2 else x2
+
+def nmin(x1,x2):
+    return x1 if x1 < x2 else x2
+
+def TR1(R,G,B):
+    e1 = R>95 and G>40 and B>20 and (int(nmax(R,nmax(G,B))) - int(nmin(R, nmin(G,B))))>15 and abs(int(R)-int(G))>15 and R>G and R>B
+    e2 = R>220 and G>210 and B>170 and abs(int(R)-int(G))<=15 and R>B and G>B
+    return e1 or e2
+
+def TR2(Y,Cr,Cb):
+    e3 = Cr <= 1.5862*Cb+20;
+    e4 = Cr >= 0.3448*Cb+76.2069;
+    e5 = Cr >= -4.5652*Cb+234.5652;
+    e6 = Cr <= -1.15*Cb+301.75;
+    e7 = Cr <= -2.2857*Cb+432.85;
+    return e3 and e4 and e5 and e6 and e7
+
+def TR3(H,S,V):
+    return (H < 35) or (H >162)
+
+def GetSkin(img):
+    rgb = img.copy()
+    hsv = cvtColor(img, COLOR_BGR2HSV)
+    ycrcb = cvtColor(img, COLOR_BGR2YCrCb)
+
+    dest = np.zeros((img.shape[0],img.shape[1]), np.uint8)
+
+    for y in range(0,img.shape[0]):
+        for x in range(0,img.shape[1]):
+            r = rgb[y][x][2]
+            g = rgb[y][x][1]
+            b = rgb[y][x][0]
+
+            tr1 = TR1(r,g,b)
+
+            Y = ycrcb[y][x][0]
+            cr= ycrcb[y][x][1]
+            cb= ycrcb[y][x][2]
+
+            tr2 = TR2(Y,cr,cb)
+
+            h = hsv[y][x][0]
+            s = hsv[y][x][1]
+            v = hsv[y][x][2]
+
+            tr3 = TR3(h,s,v)
+
+            if tr1 and tr2 and tr3:
+                dest[y][x] = 255
+    imshow("xD", dest)
+    return dest
+
 
 def DetectGestures(img):
     _, contours, hierarchy = findContours(img, RETR_TREE, CHAIN_APPROX_SIMPLE)
