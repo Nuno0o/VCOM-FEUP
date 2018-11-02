@@ -85,9 +85,11 @@ def DetectGestures(img):
     drawing = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
     biggest_centroid, bc_index = GetBiggestCentroid(hull)
 
+    orientation = GetOrientation(img)
+
     if biggest_centroid == []:
         return img, 0, False
-    peaks = GetPeaks(biggest_centroid, hull[bc_index])
+    peaks = GetPeaks(biggest_centroid, hull[bc_index], orientation)
     # Draw Centroid
     drawing[biggest_centroid[1]][biggest_centroid[0]] = color_centroids
     # To see it slightly better, draw pixels around it in same color
@@ -104,11 +106,19 @@ def DetectGestures(img):
     for i in range(len(peaks)):
         drawing[peaks[i][1]][peaks[i][0]] = color_peaks
 
-    window_x, window_y, window_size_x, window_size_y = GetWindowSize(hull[bc_index], len(peaks) + 2)
+    window_x = 0
+    window_y = 0
+
+    if orientation == 'TOPDOWN' or orientation == 'BOTTOMUP':
+        window_size_x = int(math.floor(0.2 * img.shape[1]))
+        window_size_y = img.shape[0]
+    else:
+        window_size_x = img.shape[1]
+        window_size_y = int(math.floor(0.2 * img.shape[0]))
 
     thumb = False
-    for i in range(0, len(peaks)+1):
-        thumb = GetThumb(img, i*window_size_x + window_x, window_y, window_size_x, window_size_y)
+    for i in range(0, 5):
+        thumb = GetThumb(img, i*window_size_x + window_x, i*window_size_y + window_y, window_size_x, window_size_y)
         if thumb:
             break
 
@@ -185,19 +195,50 @@ def GetBiggestCentroid(hull):
 # Given the centroid and the hull, calculate peaks and filter irrelevant peaks (below 25% of dist between centroid and the biggest peak)
 # centroid = [x_centroid, y_centroid]
 # points = [ [[x_point1, y_point1]], [[x_point2, y_point2]], ...]
-def GetPeaks(centroid, points):
+def GetPeaks(centroid, points, orientation):
     peaks = []
     # Get max VERTICAL peak
     max_peak = 0
-    for i in range(len(points)):
-        if points[i][0][1] < centroid[1]:
-            if abs(points[i][0][1] - centroid[1]) > max_peak:
-                max_peak = abs(points[i][0][1] - centroid[1])
-    for i in range(len(points)):
-        if (centroid[1] - points[i][0][1]) >= 0.3 * max_peak:
-            peaks.append(points[i][0])
-    GetPeakPlot(centroid, peaks)
-    return peaks
+    if orientation == 'BOTTOMUP':
+        for i in range(len(points)):
+            if points[i][0][1] < centroid[1]:
+                if abs(points[i][0][1] - centroid[1]) > max_peak:
+                    max_peak = abs(points[i][0][1] - centroid[1])
+        for i in range(len(points)):
+            if (centroid[1] - points[i][0][1]) >= 0.3 * max_peak:
+                peaks.append(points[i][0])
+        GetPeakPlot(centroid, peaks)
+        return peaks
+    elif orientation == 'RIGHTLEFT':
+        for i in range(len(points)):
+            if points[i][0][0] < centroid[0]:
+                if abs(points[i][0][0] - centroid[0]) > max_peak:
+                    max_peak = abs(points[i][0][0] - centroid[0])
+        for i in range(len(points)):
+            if (centroid[0] - points[i][0][0]) >= 0.3 * max_peak:
+                peaks.append(points[i][0])
+        GetPeakPlot(centroid, peaks)
+        return peaks
+    elif orientation == 'TOPDOWN':
+        for i in range(len(points)):
+            if points[i][0][1] > centroid[1]:
+                if abs(centroid[1] - points[i][0][1]) > max_peak:
+                    max_peak = abs(points[i][0][1] - centroid[1])
+        for i in range(len(points)):
+            if (points[i][0][1] - centroid[1]) >= 0.3 * max_peak:
+                peaks.append(points[i][0])
+        GetPeakPlot(centroid, peaks)
+        return peaks
+    elif orientation == 'LEFTRIGHT':
+        for i in range(len(points)):
+            if points[i][0][0] > centroid[0]:
+                if abs(centroid[0] - points[i][0][0]) > max_peak:
+                    max_peak = abs(points[i][0][0] - centroid[0])
+        for i in range(len(points)):
+            if (points[i][0][0] - centroid[0]) >= 0.3 * max_peak:
+                peaks.append(points[i][0])
+        GetPeakPlot(centroid, peaks)
+        return peaks
 
 def GetPeakPlot(centroid, peaks):
     N = len(peaks)
@@ -218,6 +259,33 @@ def GetPeakPlot(centroid, peaks):
 
     return centroid
 
+def GetOrientation(img):
+    left_count = 0
+    right_count = 0
+    top_count = 0
+    bot_count = 0
+
+    for y in range(0, img.shape[0]):
+        if img[y][0] == 255:
+            left_count += 1
+        if img[y][img.shape[1]-1] == 255:
+            right_count += 1
+    
+    for x in range(0, img.shape[1]):
+        if img[0][x] == 255:
+            top_count += 1
+        if img[img.shape[0] - 1][x] == 255:
+            bot_count += 1
+
+    if left_count > right_count and left_count > top_count and left_count > bot_count:
+        return 'LEFTRIGHT'
+    if right_count > left_count and right_count > top_count and right_count > bot_count:
+        return 'RIGHTLEFT'
+    if top_count > right_count and top_count > left_count and top_count > bot_count:
+        return 'TOPDOWN'
+    if bot_count > right_count and bot_count > top_count and bot_count > left_count:
+        return 'BOTTOMUP'
+
 def GetWhitePixelCount(img):
     count = 0
     height, width  = img.shape[0], img.shape[1]
@@ -233,8 +301,16 @@ def GetThumb(img, window_x, window_y, window_size_x, window_size_y):
 
     for y in range(window_y, window_y + window_size_y):
         for x in range(window_x, window_x + window_size_x):
+
+            if y >= img.shape[0]:
+                continue
+            if x >= img.shape[1]:
+                continue
+
             if img[y][x] == 255:
                 count += 1
+
+    # DAR MAIS FOLGA QUANDO TEMOS MAIS DEDOS DETETADOS!
 
     if count < 0.069 * totalCount:
         return True
