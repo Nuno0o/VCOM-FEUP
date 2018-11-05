@@ -27,12 +27,16 @@ if img is None:
 img = algorithm.ResizeImage(img)
 img = algorithm.SmoothImage(img)
 imgs = algorithm.DetectHands(img, args.adv)
+original = img.copy()
 if len(imgs) == 0:
     print('No hands detected')
+else:
+    print('Detected ' + str(len(imgs)) + ' hand(s)')
 for i in range(0, len(imgs)):
     x1,y1,x2,y2 = algorithm.GetRectEdges(imgs[i])
     tl = [x1,y1]
     br = [x2,y2]
+    original = algorithm.DrawRectangle(original,tl,br)
     segment = algorithm.GetRectSection(imgs[i], tl, br)
     segment = algorithm.ResizeImage(segment)
     hand, fingers, thumb = algorithm.DetectGestures(segment)
@@ -40,6 +44,7 @@ for i in range(0, len(imgs)):
     strthumb = 'a raised thumb' if thumb else 'no thumb'
     print('Hand ' + str(i) + ' with ' + str(fingers) + ' ' + strfingers + ' and ' + strthumb)
     imshow('Hand ' + str(i),hand)
+imshow('Image', original)
 sys.stdout.flush()
 if len(imgs) > 0:
     waitKey(0)

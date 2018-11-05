@@ -29,9 +29,6 @@ def DetectHands(img, advanced=False):
     else:
         ranges = GetSkinEasy(img)
 
-    #ranges = ErodeAndDilateImg(ranges)
-
-    #apply median blur to remove small dots
     ranges = medianBlur(ranges, ksize=9)
 
     #find small components not caught by median blur
@@ -441,3 +438,18 @@ def GetRectSection(img,tl,br):
     roi = clone[tl[1]:br[1],tl[0]:br[0]]
     return roi
 
+def DrawRectangle(img,tl,br):
+    #top row
+    for i in range(tl[0], br[0]):
+        img[tl[1]][i] = [0,0,255]
+    #bot row
+    for i in range(tl[0], br[0]):
+        img[br[1]][i] = [0,0,255]
+    #left column
+    for i in range(tl[1], br[1]):
+        img[i][tl[0]] = [0,0,255]
+    #right column
+    for i in range(tl[1], br[1]):
+        img[i][br[0]] = [0,0,255]
+    img[br[1]][br[0]] = [0,0,255]
+    return img
