@@ -1,4 +1,5 @@
 from cv2 import *
+import algorithm
 
 """Returns image from camera when Space is pressed, or None when Esc is pressed
 """
@@ -7,7 +8,8 @@ def CaptureCameraImage():
     img = None
     while(True):
         ret, frame = cap.read()
-        cv2.imshow('frame', frame)
+        frame2 = algorithm.GetSkinEasy(frame)
+        cv2.imshow('frame', frame2)
         key = waitKey(1)
         space_key = 32
         esc_key = 27
