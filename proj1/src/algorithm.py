@@ -51,7 +51,7 @@ def DetectHands(img, advanced=False):
 
     # minimum size of particles we want to keep (number of pixels)
     #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
-    min_size = 75*75
+    min_size = 100*100
     imgs = []
     #your answer image
     #img2 = np.zeros((output.shape),np.uint8)
