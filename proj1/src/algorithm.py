@@ -14,12 +14,12 @@ def ResizeImage(img):
     return img2
 
 def ErodeAndDilateImg(img):
-    kernel1Size_x = 3
-    kernel1Size_y = 3
+    kernel1Size_x = 2
+    kernel1Size_y = 2
     kernel = np.ones((kernel1Size_x,kernel1Size_y),np.uint8)
-    erosion = erode(img, kernel, iterations=3)
     dilation = dilate(img, kernel, iterations=3)
-    return erosion
+    #erosion = erode(img, kernel, iterations=3)
+    return dilation
 
 def DetectHands(img, advanced=False):
     ranges = None
@@ -29,6 +29,7 @@ def DetectHands(img, advanced=False):
     else:
         ranges = GetSkinEasy(img)
 
+    ranges = ErodeAndDilateImg(ranges)
     ranges = medianBlur(ranges, ksize=9)
 
     #find small components not caught by median blur
@@ -51,7 +52,7 @@ def DetectHands(img, advanced=False):
 
     # minimum size of particles we want to keep (number of pixels)
     #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
-    min_size = 100*100
+    min_size = 80*80
     imgs = []
     #your answer image
     #img2 = np.zeros((output.shape),np.uint8)
