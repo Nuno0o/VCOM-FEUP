@@ -153,7 +153,12 @@ def DetectGestures(img):
     drawContours(drawing,hull,bc_index,color,1,8)
 
     for i in range(len(peaks)):
-        drawing[peaks[i][1]][peaks[i][0]] = color_peaks
+        for y in range(0,4):
+            for x in range(0,4):
+                paint_x = peaks[i][0]+x-2
+                paint_y = peaks[i][1]+y-2
+                if paint_x >= 0 and paint_x < 400 and paint_y >= 0 and paint_y < 400:
+                    drawing[paint_y][paint_x] = color_peaks
 
     window_x = 0
     window_y = 0
@@ -163,7 +168,7 @@ def DetectGestures(img):
     if orientation == 'TOPDOWN' or orientation == 'BOTTOMUP':
         window_size_x = int(math.floor(0.2 * img.shape[1]))
         window_size_y = img.shape[0]
-        
+
         for i in range(0, 5):
             thumb = GetThumb(img, i*window_size_x + window_x, window_y, window_size_x, window_size_y, len(peaks))
             if thumb:
@@ -184,7 +189,7 @@ def RemoveRepeatedPoints(hull):
         return hull
     groups = []
     current_group = []
-    max_dist = 40
+    max_dist = 65
     for i in range(0, len(hull)):
         if len(current_group) == 0:
             current_group.append(hull[i])
@@ -301,7 +306,7 @@ def GetPeakPlot(centroid, peaks):
     for i in range(N):
         peaksx.append(peaks[i][0])
         peaksy.append(peaks[i][1])
-    
+
     colors = [[0,0,0]]
     area = np.pi*3
     plt.scatter(peaksx, peaksy, s=area, c=colors, alpha=0.5)
@@ -324,7 +329,7 @@ def GetOrientation(img):
             left_count += 1
         if img[y][img.shape[1]-1] == 255:
             right_count += 1
-    
+
     for x in range(0, img.shape[1]):
         if img[0][x] == 255:
             top_count += 1
